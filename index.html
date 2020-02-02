@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <style>
+        *,
+        ::before,
+        ::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            /* 禁用下拉刷新 */
+            overscroll-behavior-y: contain;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        #lock {
+            position: absolute;
+            top: calc(50% - 22.5vh);
+            left: calc(50% - 22.5vh);
+            width: 45vh;
+            height: 45vh;
+
+            border: 1px solid #000;
+        }
+
+        #password,
+        #value {
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: #424242;
+        }
+
+        #password {
+            top: 3rem;
+        }
+
+        #password::before {
+            content: 'Password: ';
+            font-size: 1.75rem;
+        }
+
+        #value {
+            bottom: 3rem;
+        }
+
+        #value::before {
+            content: 'Value: ';
+            font-size: 1.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="lock"></div>
+    <div id="password"></div>
+    <div id="value"></div>
+
+    <script src="./dist/graphiclock.js"></script>
+    <script>
+        window.onload = () => {
+            let pwd = '123456789';
+            const pwdElement = document.querySelector('#password');
+            const valueElement = document.querySelector('#value');
+
+            const gl = new GraphicLock('#lock', {
+                complete: (value) => {
+                    valueElement.innerText = value;
+                },
+                reset: () => {
+                },
+                verify: (value) => {
+                    return false;
+                }
+            });
+
+            pwdElement.innerText = pwd;
+            valueElement.innerText = '?';
+        }
+    </script>
+</body>
+
+</html>
