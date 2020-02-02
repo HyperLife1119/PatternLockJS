@@ -164,14 +164,13 @@ class GraphicLock {
     addTouchStartEventListener(dot: Dot) {
         dot.element.ontouchstart = (e: any) => {
             e.stopPropagation(); // 阻止冒泡
-            // 如果触摸点大于一 如果图形锁以及被操作过 如果该点没有被选中
+            // 如果触摸点大于一 如果图形锁已经被操作过 如果该点没有被选中
             if (e.touches.length > 1 || this.isDirty || dot.isActive) { return; }
 
             this.isDirty = true;
             dot.isActive = true;
             dot.element.setAttribute('fill', '#a7ffeb');
             this.drawDot(dot.x, dot.y, this.radius / 2.5, '#1de9b6', 'inner-dot'); // 添加小圆点
-            console.log(1)
 
             this.lastPos = new Vector(dot.x, dot.y);    // 上一个坐标点
             this.currentPos = new Vector(dot.x, dot.y); // 当前坐标点
@@ -182,7 +181,7 @@ class GraphicLock {
                 style: `fill:none;stroke-width:${this.radius / 4}`
             });
             this.svg.appendChild(this.polyline);
-            console.log(2)
+
             this.value = `${dot.value}`;
         }
     }
@@ -241,7 +240,7 @@ class GraphicLock {
             setTimeout(() => {
                 this.container.style.pointerEvents = 'auto';
                 this.reset();
-            }, 1750);
+            }, 1500);
         }
         this.svg.ontouchend = () => {
             complete();
@@ -267,6 +266,8 @@ class GraphicLock {
             for (let i = 0; i < innerDots.length; i++) {
                 innerDots[i].setAttribute('fill', '#ff5252');
             }
+            // 震动150毫秒
+            if ('vibrate' in window.navigator) { window.navigator.vibrate(150); }
         }
     }
 

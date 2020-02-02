@@ -111,7 +111,6 @@ var GraphicLock = (function () {
             dot.isActive = true;
             dot.element.setAttribute('fill', '#a7ffeb');
             _this.drawDot(dot.x, dot.y, _this.radius / 2.5, '#1de9b6', 'inner-dot');
-            console.log(1);
             _this.lastPos = new Vector(dot.x, dot.y);
             _this.currentPos = new Vector(dot.x, dot.y);
             _this.points = dot.x + " " + dot.y + " ";
@@ -121,7 +120,6 @@ var GraphicLock = (function () {
                 style: "fill:none;stroke-width:" + _this.radius / 4
             });
             _this.svg.appendChild(_this.polyline);
-            console.log(2);
             _this.value = "" + dot.value;
         };
     };
@@ -169,7 +167,7 @@ var GraphicLock = (function () {
             setTimeout(function () {
                 _this.container.style.pointerEvents = 'auto';
                 _this.reset();
-            }, 1750);
+            }, 1500);
         };
         this.svg.ontouchend = function () {
             complete();
@@ -190,6 +188,9 @@ var GraphicLock = (function () {
             var innerDots = document.querySelectorAll('.inner-dot');
             for (var i = 0; i < innerDots.length; i++) {
                 innerDots[i].setAttribute('fill', '#ff5252');
+            }
+            if ('vibrate' in window.navigator) {
+                window.navigator.vibrate(150);
             }
         }
     };

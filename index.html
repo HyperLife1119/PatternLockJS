@@ -73,7 +73,7 @@
     <script src="./dist/graphiclock.js"></script>
     <script>
         window.onload = () => {
-            let pwd = '123456789';
+            let pwd = '123654789';
             const pwdElement = document.querySelector('#password');
             const valueElement = document.querySelector('#value');
 
@@ -84,7 +84,13 @@
                 reset: () => {
                 },
                 verify: (value) => {
-                    return false;
+                    if (value == pwd) {
+                        alert('密码正确！');
+                        return true;
+                    } else {
+                        
+                        return false;
+                    }
                 }
             });
 
