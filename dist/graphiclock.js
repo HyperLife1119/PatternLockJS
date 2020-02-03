@@ -64,21 +64,35 @@ var Dot = (function (_super) {
     }
     return Dot;
 }(Vector));
+var Css = (function () {
+    function Css() {
+    }
+    Css.addStyle = function (style) {
+        var element = document.createElement('style');
+        element.innerHTML = style;
+        document.head.appendChild(element);
+        return element;
+    };
+    return Css;
+}());
 var GraphicLock = (function () {
     function GraphicLock(selectors, callback) {
         if (callback === void 0) { callback = {}; }
         this.dotsPos = [];
         this.container = document.querySelector(selectors);
         this.callback = callback;
-        this.width = this.container.clientWidth;
-        this.radius = this.width / 6 * .7;
-        this.margin = (this.width - this.radius * 6) / 4;
-        this.init();
-    }
-    GraphicLock.prototype.init = function () {
         this.svg = Svg.createSvgElement();
         this.svg.style.width = this.svg.style.height = '100%';
         this.container.appendChild(this.svg);
+        this.resize();
+        this.init();
+    }
+    GraphicLock.prototype.init = function () {
+        this.width = this.container.clientWidth;
+        this.radius = this.width / 6 * .7;
+        this.margin = (this.width - this.radius * 6) / 4;
+        this.style && document.head.removeChild(this.style);
+        this.style = Css.addStyle("\n            .inner-dot {\n                animation: gl-inner-dot-scale .25s ease-in;\n            }\n            @keyframes gl-inner-dot-scale {\n                0% {\n                    r: " + this.radius / 2.5 + ";\n                } 50% {\n                    r: " + this.radius / 2 + ";\n                } 100% {\n                    r: " + this.radius / 2.5 + ";\n                }\n            }\n        ");
         var pos = [
             this.radius + this.margin,
             this.radius * 3 + this.margin * 2,
@@ -95,6 +109,8 @@ var GraphicLock = (function () {
             new Dot(pos[1], pos[2], '8'),
             new Dot(pos[2], pos[2], '9')
         ];
+        this.addTouchMoveEventListener();
+        this.addTouchCompleteEventListener();
         this.reset();
     };
     GraphicLock.prototype.addClickEventListener = function (dot) {
@@ -183,15 +199,17 @@ var GraphicLock = (function () {
     GraphicLock.prototype.addTouchCompleteEventListener = function () {
         var _this = this;
         var complete = function () {
-            _this.verify();
+            if (!_this.isDirty) {
+                return;
+            }
             _this.container.style.pointerEvents = 'none';
             _this.polyline && _this.polyline.setAttribute('points', _this.points);
-            if (_this.isDirty)
-                _this.callback.complete && _this.callback.complete(_this.value);
+            _this.verify();
+            _this.callback.complete && _this.callback.complete(_this.value);
             setTimeout(function () {
-                _this.container.style.pointerEvents = 'auto';
                 _this.reset();
-            }, 1250);
+                _this.container.style.pointerEvents = 'auto';
+            }, 1000);
         };
         if ('ontouchend' in document.documentElement) {
             this.svg.addEventListener('touchend', function () {
@@ -206,6 +224,12 @@ var GraphicLock = (function () {
                 complete();
             });
         }
+    };
+    GraphicLock.prototype.resize = function () {
+        var _this = this;
+        window.addEventListener('resize', this.debounce(function () {
+            _this.init();
+        }, 250));
     };
     GraphicLock.prototype.verify = function () {
         if (!this.callback.verify || !this.callback.verify(this.value)) {
@@ -239,8 +263,6 @@ var GraphicLock = (function () {
             dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
             this.addClickEventListener(dot);
         }
-        this.addTouchMoveEventListener();
-        this.addTouchCompleteEventListener();
         this.callback.reset && this.callback.reset();
     };
     GraphicLock.prototype.drawDot = function (cx, cy, r, fill, className) {
@@ -249,6 +271,20 @@ var GraphicLock = (function () {
         });
         this.svg.appendChild(dotElement);
         return dotElement;
+    };
+    GraphicLock.prototype.debounce = function (fn, delay) {
+        var _this = this;
+        var timer = null;
+        return function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            timer && clearTimeout(timer);
+            timer = setTimeout(function () {
+                fn.apply(_this, args);
+            }, delay);
+        };
     };
     return GraphicLock;
 }());

@@ -78,19 +78,31 @@ class Dot extends Vector {
         this.isActive = isActive;
     }
 }
+class Css {
+    /**
+     * 添加CSS样式
+     * @param style 样式
+     */
+    static addStyle(style: string): Element {
+        const element = document.createElement('style');
+        element.innerHTML = style;
+        document.head.appendChild(element);
+        return element;
+    }
+}
 class GraphicLock {
     /** 图形锁父容器元素 */
-    container: any;
+    container: Element | any;
     /** 回调函数对象 */
     callback: any;
     /** 图形锁的值 */
     value: string | any;
     /** 图形锁的宽度（宽度将等于高度）*/
-    width: number;
+    width: number | any;
     /** 圆点的半径 */
-    radius: number;
+    radius: number | any;
     /** 圆点的外边距 */
-    margin: number;
+    margin: number | any;
     /** 图形锁SVG 元素 */
     svg: Element | any;
     /** 储存九个圆点实例的数组 */
@@ -105,6 +117,8 @@ class GraphicLock {
     points: string | any;
     /** 图形锁是否被操作过 */
     isDirty: boolean | any;
+    /** 图形锁的动画样式 */
+    style: Element | any;
 
     /**
      * 构造函数
@@ -115,20 +129,40 @@ class GraphicLock {
         this.container = document.querySelector(selectors);
         this.callback = callback;
 
-        this.width = this.container.clientWidth;
-        this.radius = this.width / 6 * .7;
-        this.margin = (this.width - this.radius * 6) / 4;
+        this.svg = Svg.createSvgElement();
+        this.svg.style.width = this.svg.style.height = '100%';
+        this.container.appendChild(this.svg);
+
+        this.resize();
 
         this.init();
+
     }
 
     /**
      * 初始化图形锁
      */
     init() {
-        this.svg = Svg.createSvgElement();
-        this.svg.style.width = this.svg.style.height = '100%';
-        this.container.appendChild(this.svg);
+        // 根据父元素的尺寸计算图形锁的一些尺寸
+        this.width = this.container.clientWidth;
+        this.radius = this.width / 6 * .7;
+        this.margin = (this.width - this.radius * 6) / 4;
+
+        this.style && document.head.removeChild(this.style);
+        this.style = Css.addStyle(`
+            .inner-dot {
+                animation: gl-inner-dot-scale .25s ease-in;
+            }
+            @keyframes gl-inner-dot-scale {
+                0% {
+                    r: ${this.radius / 2.5};
+                } 50% {
+                    r: ${this.radius / 2};
+                } 100% {
+                    r: ${this.radius / 2.5};
+                }
+            }
+        `);
 
         const pos = [
             this.radius + this.margin,
@@ -148,11 +182,14 @@ class GraphicLock {
             new Dot(pos[2], pos[2], '9')
         ];
 
+        this.addTouchMoveEventListener();
+        this.addTouchCompleteEventListener();
+
         this.reset();
     }
 
     /**
-     * 为圆点元素添加ontouchstart或onclick事件
+     * 为圆点元素添加ontouchstart或mousemove事件
      * @param dot
      */
     addClickEventListener(dot: Dot) {
@@ -251,14 +288,15 @@ class GraphicLock {
      */
     addTouchCompleteEventListener() {
         const complete = () => {
-            this.verify();
+            if (!this.isDirty) { return; }
             this.container.style.pointerEvents = 'none'; // 禁止触摸
             this.polyline && this.polyline.setAttribute('points', this.points); // 截断被手指拉长的那段线
-            if (this.isDirty) this.callback.complete && this.callback.complete(this.value);
+            this.verify();
+            this.callback.complete && this.callback.complete(this.value);
             setTimeout(() => {
-                this.container.style.pointerEvents = 'auto';
                 this.reset();
-            }, 1250);
+                this.container.style.pointerEvents = 'auto';
+            }, 1000);
         }
 
         if ('ontouchend' in document.documentElement) {
@@ -274,6 +312,12 @@ class GraphicLock {
                 complete();
             });
         }
+    }
+
+    resize() {
+        window.addEventListener('resize', this.debounce(() => {
+            this.init();
+        }, 250));
     }
 
     /**
@@ -312,9 +356,6 @@ class GraphicLock {
             this.addClickEventListener(dot);
         }
 
-        this.addTouchMoveEventListener();
-        this.addTouchCompleteEventListener();
-
         this.callback.reset && this.callback.reset();
     }
 
@@ -333,5 +374,20 @@ class GraphicLock {
         this.svg.appendChild(dotElement);
 
         return dotElement;
+    }
+
+    /**
+     * 防抖函数
+     * @param fn 需要进行防抖的函数
+     * @param delay 防抖时间
+     */
+    debounce(fn: Function, delay: number) {
+        let timer: any = null;
+        return (...args: Array<any>) => {
+            timer && clearTimeout(timer);
+            timer = setTimeout(() => {
+                fn.apply(this, args);
+            }, delay);
+        }
     }
 }
