@@ -86,6 +86,7 @@ var GraphicLock = (function () {
         this.container.appendChild(this.svg);
         this.resize();
         this.init();
+        this.reset();
     }
     GraphicLock.prototype.init = function () {
         this.width = this.container.clientWidth;
@@ -93,25 +94,26 @@ var GraphicLock = (function () {
         this.margin = (this.width - this.radius * 6) / 4;
         this.style && document.head.removeChild(this.style);
         this.style = Css.addStyle("\n            .inner-dot {\n                animation: gl-inner-dot-scale .25s ease-in;\n            }\n            @keyframes gl-inner-dot-scale {\n                0% {\n                    r: " + this.radius / 2.5 + ";\n                } 50% {\n                    r: " + this.radius / 2 + ";\n                } 100% {\n                    r: " + this.radius / 2.5 + ";\n                }\n            }\n        ");
-        var pos = [
-            this.radius + this.margin,
-            this.radius * 3 + this.margin * 2,
-            this.radius * 5 + this.margin * 3
-        ];
-        this.dotsPos = [
-            new Dot(pos[0], pos[0], '1'),
-            new Dot(pos[1], pos[0], '2'),
-            new Dot(pos[2], pos[0], '3'),
-            new Dot(pos[0], pos[1], '4'),
-            new Dot(pos[1], pos[1], '5'),
-            new Dot(pos[2], pos[1], '6'),
-            new Dot(pos[0], pos[2], '7'),
-            new Dot(pos[1], pos[2], '8'),
-            new Dot(pos[2], pos[2], '9')
-        ];
-        this.addTouchMoveEventListener();
-        this.addTouchCompleteEventListener();
-        this.reset();
+        if (this.dotsPos.length == 0) {
+            var pos = [
+                this.radius + this.margin,
+                this.radius * 3 + this.margin * 2,
+                this.radius * 5 + this.margin * 3
+            ];
+            this.dotsPos = [
+                new Dot(pos[0], pos[0], '1'),
+                new Dot(pos[1], pos[0], '2'),
+                new Dot(pos[2], pos[0], '3'),
+                new Dot(pos[0], pos[1], '4'),
+                new Dot(pos[1], pos[1], '5'),
+                new Dot(pos[2], pos[1], '6'),
+                new Dot(pos[0], pos[2], '7'),
+                new Dot(pos[1], pos[2], '8'),
+                new Dot(pos[2], pos[2], '9')
+            ];
+            this.addTouchMoveEventListener();
+            this.addTouchCompleteEventListener();
+        }
     };
     GraphicLock.prototype.addClickEventListener = function (dot) {
         var _this = this;
@@ -229,6 +231,27 @@ var GraphicLock = (function () {
         var _this = this;
         window.addEventListener('resize', this.debounce(function () {
             _this.init();
+            var pos = [
+                _this.radius + _this.margin,
+                _this.radius * 3 + _this.margin * 2,
+                _this.radius * 5 + _this.margin * 3
+            ];
+            var dotsPos = [
+                new Dot(pos[0], pos[0], '1'),
+                new Dot(pos[1], pos[0], '2'),
+                new Dot(pos[2], pos[0], '3'),
+                new Dot(pos[0], pos[1], '4'),
+                new Dot(pos[1], pos[1], '5'),
+                new Dot(pos[2], pos[1], '6'),
+                new Dot(pos[0], pos[2], '7'),
+                new Dot(pos[1], pos[2], '8'),
+                new Dot(pos[2], pos[2], '9')
+            ];
+            for (var i = 0; i < dotsPos.length; i++) {
+                _this.dotsPos[i].x = _this.dotsPos[i].element.style.cx = dotsPos[i].x;
+                _this.dotsPos[i].y = _this.dotsPos[i].element.style.cy = dotsPos[i].y;
+                _this.dotsPos[i].element.style.r = _this.radius;
+            }
         }, 250));
     };
     GraphicLock.prototype.verify = function () {

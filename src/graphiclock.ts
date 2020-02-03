@@ -136,7 +136,7 @@ class GraphicLock {
         this.resize();
 
         this.init();
-
+        this.reset();
     }
 
     /**
@@ -164,28 +164,27 @@ class GraphicLock {
             }
         `);
 
-        const pos = [
-            this.radius + this.margin,
-            this.radius * 3 + this.margin * 2,
-            this.radius * 5 + this.margin * 3
-        ];
+        if (this.dotsPos.length == 0) {
+            const pos = [
+                this.radius + this.margin,
+                this.radius * 3 + this.margin * 2,
+                this.radius * 5 + this.margin * 3
+            ];
+            this.dotsPos = [
+                new Dot(pos[0], pos[0], '1'),
+                new Dot(pos[1], pos[0], '2'),
+                new Dot(pos[2], pos[0], '3'),
+                new Dot(pos[0], pos[1], '4'),
+                new Dot(pos[1], pos[1], '5'),
+                new Dot(pos[2], pos[1], '6'),
+                new Dot(pos[0], pos[2], '7'),
+                new Dot(pos[1], pos[2], '8'),
+                new Dot(pos[2], pos[2], '9')
+            ];
 
-        this.dotsPos = [
-            new Dot(pos[0], pos[0], '1'),
-            new Dot(pos[1], pos[0], '2'),
-            new Dot(pos[2], pos[0], '3'),
-            new Dot(pos[0], pos[1], '4'),
-            new Dot(pos[1], pos[1], '5'),
-            new Dot(pos[2], pos[1], '6'),
-            new Dot(pos[0], pos[2], '7'),
-            new Dot(pos[1], pos[2], '8'),
-            new Dot(pos[2], pos[2], '9')
-        ];
-
-        this.addTouchMoveEventListener();
-        this.addTouchCompleteEventListener();
-
-        this.reset();
+            this.addTouchMoveEventListener();
+            this.addTouchCompleteEventListener();
+        }
     }
 
     /**
@@ -317,6 +316,29 @@ class GraphicLock {
     resize() {
         window.addEventListener('resize', this.debounce(() => {
             this.init();
+
+            const pos = [
+                this.radius + this.margin,
+                this.radius * 3 + this.margin * 2,
+                this.radius * 5 + this.margin * 3
+            ];
+            const dotsPos = [
+                new Dot(pos[0], pos[0], '1'),
+                new Dot(pos[1], pos[0], '2'),
+                new Dot(pos[2], pos[0], '3'),
+                new Dot(pos[0], pos[1], '4'),
+                new Dot(pos[1], pos[1], '5'),
+                new Dot(pos[2], pos[1], '6'),
+                new Dot(pos[0], pos[2], '7'),
+                new Dot(pos[1], pos[2], '8'),
+                new Dot(pos[2], pos[2], '9')
+            ];
+
+            for (let i = 0; i < dotsPos.length; i++) { // 给圆点实例重新赋值
+                this.dotsPos[i].x = this.dotsPos[i].element.style.cx = dotsPos[i].x;
+                this.dotsPos[i].y = this.dotsPos[i].element.style.cy = dotsPos[i].y;
+                this.dotsPos[i].element.style.r = this.radius;
+            }
         }, 250));
     }
 
