@@ -187,7 +187,7 @@ class GraphicLock {
         } else {
             dot.element.addEventListener('mousemove', (e: any) => {
                 // 如果鼠标移动时按下左键
-                if (e.which == 1) { listener(); }
+                if (e.buttons == 1) { listener(); }
             });
         }
 
@@ -241,7 +241,7 @@ class GraphicLock {
         } else {
             document.addEventListener('mousemove', (e: any) => {
                 // 如果鼠标移动时按下左键
-                if (e.which == 1) { listener(e.clientX, e.clientY, e); }
+                if (e.buttons == 1) { listener(e.clientX, e.clientY, e); }
             });
         }
     }

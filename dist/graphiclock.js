@@ -128,7 +128,7 @@ var GraphicLock = (function () {
         }
         else {
             dot.element.addEventListener('mousemove', function (e) {
-                if (e.which == 1) {
+                if (e.buttons == 1) {
                     listener();
                 }
             });
@@ -174,7 +174,7 @@ var GraphicLock = (function () {
         }
         else {
             document.addEventListener('mousemove', function (e) {
-                if (e.which == 1) {
+                if (e.buttons == 1) {
                     listener(e.clientX, e.clientY, e);
                 }
             });
