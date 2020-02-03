@@ -70,16 +70,13 @@ var GraphicLock = (function () {
         this.dotsPos = [];
         this.container = document.querySelector(selectors);
         this.callback = callback;
-        this.value = '';
         this.width = this.container.clientWidth;
         this.radius = this.width / 6 * .7;
         this.margin = (this.width - this.radius * 6) / 4;
-        this.svg = Svg.createSvgElement();
-        this.points = '';
-        this.isDirty = false;
         this.init();
     }
     GraphicLock.prototype.init = function () {
+        this.svg = Svg.createSvgElement();
         this.svg.style.width = this.svg.style.height = '100%';
         this.container.appendChild(this.svg);
         var pos = [
@@ -88,23 +85,22 @@ var GraphicLock = (function () {
             this.radius * 5 + this.margin * 3
         ];
         this.dotsPos = [
-            new Dot(pos[0], pos[0], 1),
-            new Dot(pos[1], pos[0], 2),
-            new Dot(pos[2], pos[0], 3),
-            new Dot(pos[0], pos[1], 4),
-            new Dot(pos[1], pos[1], 5),
-            new Dot(pos[2], pos[1], 6),
-            new Dot(pos[0], pos[2], 7),
-            new Dot(pos[1], pos[2], 8),
-            new Dot(pos[2], pos[2], 9)
+            new Dot(pos[0], pos[0], '1'),
+            new Dot(pos[1], pos[0], '2'),
+            new Dot(pos[2], pos[0], '3'),
+            new Dot(pos[0], pos[1], '4'),
+            new Dot(pos[1], pos[1], '5'),
+            new Dot(pos[2], pos[1], '6'),
+            new Dot(pos[0], pos[2], '7'),
+            new Dot(pos[1], pos[2], '8'),
+            new Dot(pos[2], pos[2], '9')
         ];
         this.reset();
     };
-    GraphicLock.prototype.addTouchStartEventListener = function (dot) {
+    GraphicLock.prototype.addClickEventListener = function (dot) {
         var _this = this;
-        dot.element.ontouchstart = function (e) {
-            e.stopPropagation();
-            if (e.touches.length > 1 || _this.isDirty || dot.isActive) {
+        var listener = function () {
+            if (_this.isDirty || dot.isActive) {
                 return;
             }
             _this.isDirty = true;
@@ -122,15 +118,31 @@ var GraphicLock = (function () {
             _this.svg.appendChild(_this.polyline);
             _this.value = "" + dot.value;
         };
+        if ('ontouchstart' in document.documentElement) {
+            dot.element.addEventListener('touchstart', function (e) {
+                e.stopPropagation();
+                if (e.touches.length == 1) {
+                    listener();
+                }
+            });
+        }
+        else {
+            dot.element.addEventListener('mousemove', function (e) {
+                if (e.which == 1) {
+                    listener();
+                }
+            });
+        }
     };
     GraphicLock.prototype.addTouchMoveEventListener = function () {
         var _this = this;
-        this.svg.ontouchmove = function (e) {
+        var listener = function (x, y, e) {
             e.preventDefault();
             if (!_this.polyline) {
                 return;
             }
-            var x = e.changedTouches[0].clientX - _this.container.offsetLeft, y = e.changedTouches[0].clientY - _this.container.offsetTop;
+            x = x - _this.container.offsetLeft;
+            y = y - _this.container.offsetTop;
             for (var _i = 0, _a = _this.dotsPos; _i < _a.length; _i++) {
                 var dot = _a[_i];
                 if (!dot.isActive && dot.getDistance(x, y) <= _this.radius * .85) {
@@ -155,6 +167,18 @@ var GraphicLock = (function () {
                 _this.polyline.setAttribute('points', _this.points + (x + " " + y + " "));
             }
         };
+        if ('ontouchmove' in document.documentElement) {
+            this.svg.addEventListener('touchmove', function (e) {
+                listener(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e);
+            });
+        }
+        else {
+            document.addEventListener('mousemove', function (e) {
+                if (e.which == 1) {
+                    listener(e.clientX, e.clientY, e);
+                }
+            });
+        }
     };
     GraphicLock.prototype.addTouchCompleteEventListener = function () {
         var _this = this;
@@ -167,14 +191,21 @@ var GraphicLock = (function () {
             setTimeout(function () {
                 _this.container.style.pointerEvents = 'auto';
                 _this.reset();
-            }, 1500);
+            }, 1250);
         };
-        this.svg.ontouchend = function () {
-            complete();
-        };
-        this.svg.ontouchcancel = function () {
-            complete();
-        };
+        if ('ontouchend' in document.documentElement) {
+            this.svg.addEventListener('touchend', function () {
+                complete();
+            });
+            this.svg.addEventListener('touchcancel', function () {
+                complete();
+            });
+        }
+        else {
+            document.addEventListener('mouseup', function () {
+                complete();
+            });
+        }
     };
     GraphicLock.prototype.verify = function () {
         if (!this.callback.verify || !this.callback.verify(this.value)) {
@@ -206,7 +237,7 @@ var GraphicLock = (function () {
                 dot.isActive = false;
             }
             dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
-            this.addTouchStartEventListener(dot);
+            this.addClickEventListener(dot);
         }
         this.addTouchMoveEventListener();
         this.addTouchCompleteEventListener();

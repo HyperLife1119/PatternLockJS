@@ -9,7 +9,7 @@ class Svg {
     static createElement(name: string, attrObj: any): Element {
         const element = document.createElementNS(Svg.namespace, name);
         for (let key in attrObj) {
-            element.setAttribute(key, attrObj[key])
+            element.setAttribute(key, attrObj[key]);
         }
         return element;
     }
@@ -55,7 +55,7 @@ class Vector {
      */
     isOnLine(x1: number, y1: number, x2: number, y2: number) {
         if (this.y >= Math.min(y1, y2) && this.y <= Math.max(y1, y2) && this.x >= Math.min(x1, x2) && this.x <= Math.max(x1, x2)) {
-            let precision = (this.x - x1) * (y1 - y2) - (x1 - x2) * (this.y - y1);
+            const precision = (this.x - x1) * (y1 - y2) - (x1 - x2) * (this.y - y1);
             if (precision < 2e-10 && precision > -2e-10) { // 实质判断是否接近0
                 return true;
             }
@@ -66,13 +66,13 @@ class Vector {
 // 圆点
 class Dot extends Vector {
     /** 圆点的值 */
-    value: any;
+    value: string;
     /** 是否被选中 */
     isActive: boolean;
     /** 圆点元素 */
-    element: any;
+    element: Element | any;
 
-    constructor(x: number, y: number, value: any, isActive: boolean = false) {
+    constructor(x: number, y: number, value: string, isActive: boolean = false) {
         super(x, y);
         this.value = value;
         this.isActive = isActive;
@@ -84,7 +84,7 @@ class GraphicLock {
     /** 回调函数对象 */
     callback: any;
     /** 图形锁的值 */
-    value: string;
+    value: string | any;
     /** 图形锁的宽度（宽度将等于高度）*/
     width: number;
     /** 圆点的半径 */
@@ -92,7 +92,7 @@ class GraphicLock {
     /** 圆点的外边距 */
     margin: number;
     /** 图形锁SVG 元素 */
-    svg: any;
+    svg: Element | any;
     /** 储存九个圆点实例的数组 */
     dotsPos: Array<Dot> = [];
     /** 折线元素 */
@@ -102,9 +102,9 @@ class GraphicLock {
     /** 折线的当前坐标 */
     currentPos: Vector | any;
     /** 折线的points属性值 */
-    points: string;
+    points: string | any;
     /** 图形锁是否被操作过 */
-    isDirty: boolean;
+    isDirty: boolean | any;
 
     /**
      * 构造函数
@@ -114,17 +114,10 @@ class GraphicLock {
     constructor(selectors: string, callback: any = {}) {
         this.container = document.querySelector(selectors);
         this.callback = callback;
-        this.value = '';
 
         this.width = this.container.clientWidth;
         this.radius = this.width / 6 * .7;
         this.margin = (this.width - this.radius * 6) / 4;
-
-        this.svg = Svg.createSvgElement();
-
-        this.points = '';
-
-        this.isDirty = false;
 
         this.init();
     }
@@ -133,6 +126,7 @@ class GraphicLock {
      * 初始化图形锁
      */
     init() {
+        this.svg = Svg.createSvgElement();
         this.svg.style.width = this.svg.style.height = '100%';
         this.container.appendChild(this.svg);
 
@@ -143,29 +137,28 @@ class GraphicLock {
         ];
 
         this.dotsPos = [
-            new Dot(pos[0], pos[0], 1),
-            new Dot(pos[1], pos[0], 2),
-            new Dot(pos[2], pos[0], 3),
-            new Dot(pos[0], pos[1], 4),
-            new Dot(pos[1], pos[1], 5),
-            new Dot(pos[2], pos[1], 6),
-            new Dot(pos[0], pos[2], 7),
-            new Dot(pos[1], pos[2], 8),
-            new Dot(pos[2], pos[2], 9)
+            new Dot(pos[0], pos[0], '1'),
+            new Dot(pos[1], pos[0], '2'),
+            new Dot(pos[2], pos[0], '3'),
+            new Dot(pos[0], pos[1], '4'),
+            new Dot(pos[1], pos[1], '5'),
+            new Dot(pos[2], pos[1], '6'),
+            new Dot(pos[0], pos[2], '7'),
+            new Dot(pos[1], pos[2], '8'),
+            new Dot(pos[2], pos[2], '9')
         ];
 
         this.reset();
     }
 
     /**
-     * 为圆点元素添加ontouchstart事件
+     * 为圆点元素添加ontouchstart或onclick事件
      * @param dot
      */
-    addTouchStartEventListener(dot: Dot) {
-        dot.element.ontouchstart = (e: any) => {
-            e.stopPropagation(); // 阻止冒泡
-            // 如果触摸点大于一 如果图形锁已经被操作过 如果该点没有被选中
-            if (e.touches.length > 1 || this.isDirty || dot.isActive) { return; }
+    addClickEventListener(dot: Dot) {
+        const listener = () => {
+            // 如果图形锁已经被操作过 如果该点没有被选中
+            if (this.isDirty || dot.isActive) { return; }
 
             this.isDirty = true;
             dot.isActive = true;
@@ -184,18 +177,32 @@ class GraphicLock {
 
             this.value = `${dot.value}`;
         }
+
+        if ('ontouchstart' in document.documentElement) {
+            dot.element.addEventListener('touchstart', (e: any) => {
+                e.stopPropagation(); // 阻止冒泡
+                // 如果触摸点大于一
+                if (e.touches.length == 1) { listener(); }
+            });
+        } else {
+            dot.element.addEventListener('mousemove', (e: any) => {
+                // 如果鼠标移动时按下左键
+                if (e.which == 1) { listener(); }
+            });
+        }
+
     }
 
     /**
      * 为图形锁SVG元素添加ontouchmove事件
      */
     addTouchMoveEventListener() {
-        this.svg.ontouchmove = (e: any) => {
+        const listener = (x: number, y: number, e: any) => {
             e.preventDefault(); // 防止浏览器下拉
-            if (!this.polyline) { return; } // 如果折线存在
+            if (!this.polyline) { return; } // 如果折线不存在
 
-            const x = e.changedTouches[0].clientX - this.container.offsetLeft,
-                y = e.changedTouches[0].clientY - this.container.offsetTop;
+            x = x - this.container.offsetLeft;
+            y = y - this.container.offsetTop;
 
             for (let dot of this.dotsPos) {
                 // 如果这个点没有被选中而且当前坐标在圆内
@@ -226,6 +233,17 @@ class GraphicLock {
                 this.polyline.setAttribute('points', this.points + `${x} ${y} `);
             }
         }
+
+        if ('ontouchmove' in document.documentElement) {
+            this.svg.addEventListener('touchmove', (e: any) => {
+                listener(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e);
+            })
+        } else {
+            document.addEventListener('mousemove', (e: any) => {
+                // 如果鼠标移动时按下左键
+                if (e.which == 1) { listener(e.clientX, e.clientY, e); }
+            });
+        }
     }
 
     /**
@@ -240,14 +258,21 @@ class GraphicLock {
             setTimeout(() => {
                 this.container.style.pointerEvents = 'auto';
                 this.reset();
-            }, 1500);
-        }
-        this.svg.ontouchend = () => {
-            complete();
+            }, 1250);
         }
 
-        this.svg.ontouchcancel = () => { // 当触摸事件被意外终端时
-            complete();
+        if ('ontouchend' in document.documentElement) {
+            this.svg.addEventListener('touchend', () => {
+                complete();
+            });
+
+            this.svg.addEventListener('touchcancel', () => { // 当触摸事件被意外中断时
+                complete();
+            });
+        } else {
+            document.addEventListener('mouseup', () => { // 当鼠标松开时
+                complete();
+            });
         }
     }
 
@@ -284,7 +309,7 @@ class GraphicLock {
         for (let dot of this.dotsPos) { // 绘制大圆点
             if (dot.isActive) { dot.isActive = false; } // 取消选中
             dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
-            this.addTouchStartEventListener(dot);
+            this.addClickEventListener(dot);
         }
 
         this.addTouchMoveEventListener();

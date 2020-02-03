@@ -1,2 +1,2 @@
 # GraphicLockJS
- A Lightweight Mobile Graphic Lock
+ A Lightweight Graphic Lock Running on Web Page.
