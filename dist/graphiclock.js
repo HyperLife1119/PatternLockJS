@@ -86,7 +86,6 @@ var GraphicLock = (function () {
         this.container.appendChild(this.svg);
         this.resize();
         this.init();
-        this.reset();
     }
     GraphicLock.prototype.init = function () {
         this.width = this.container.clientWidth;
@@ -111,6 +110,10 @@ var GraphicLock = (function () {
                 new Dot(pos[1], pos[2], '8'),
                 new Dot(pos[2], pos[2], '9')
             ];
+            for (var _i = 0, _a = this.dotsPos; _i < _a.length; _i++) {
+                var dot = _a[_i];
+                dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
+            }
             this.addTouchMoveEventListener();
             this.addTouchCompleteEventListener();
         }
@@ -273,17 +276,25 @@ var GraphicLock = (function () {
         }
     };
     GraphicLock.prototype.reset = function () {
-        this.svg.innerHTML = '';
         this.points = '';
         this.value = '';
         this.isDirty = false;
-        this.polyline = null;
+        if (this.polyline) {
+            this.svg.removeChild(this.polyline);
+            this.polyline = null;
+        }
+        var innderDots = this.svg.querySelectorAll('.inner-dot');
+        for (var innerDot in innderDots) {
+            this.svg.removeChild(innerDot);
+        }
         for (var _i = 0, _a = this.dotsPos; _i < _a.length; _i++) {
             var dot = _a[_i];
             if (dot.isActive) {
                 dot.isActive = false;
             }
-            dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
+            if (dot.element.style.fill != '#eee') {
+                dot.element.style.fill = '#eee';
+            }
             this.addClickEventListener(dot);
         }
         this.callback.reset && this.callback.reset();

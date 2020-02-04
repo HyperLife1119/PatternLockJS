@@ -136,7 +136,6 @@ class GraphicLock {
         this.resize();
 
         this.init();
-        this.reset();
     }
 
     /**
@@ -181,6 +180,10 @@ class GraphicLock {
                 new Dot(pos[1], pos[2], '8'),
                 new Dot(pos[2], pos[2], '9')
             ];
+
+            for (let dot of this.dotsPos) { // 绘制大圆点
+                dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
+            }
 
             this.addTouchMoveEventListener();
             this.addTouchCompleteEventListener();
@@ -366,15 +369,24 @@ class GraphicLock {
      * 重置图形锁
      */
     reset() {
-        this.svg.innerHTML = ''; // 清空SVG元素内部元素
         this.points = '';
         this.value = '';
         this.isDirty = false;
-        this.polyline = null;
+
+        if (this.polyline) {
+            this.svg.removeChild(this.polyline);
+            this.polyline = null;
+        }
+
+        const innderDots = this.svg.querySelectorAll('.inner-dot');
+
+        for (let innerDot in innderDots) { // 清除所有小圆点
+            this.svg.removeChild(innerDot);
+        }
 
         for (let dot of this.dotsPos) { // 绘制大圆点
             if (dot.isActive) { dot.isActive = false; } // 取消选中
-            dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
+            if (dot.element.style.fill != '#eee') { dot.element.style.fill = '#eee'; } // 恢复默认颜色
             this.addClickEventListener(dot);
         }
 
