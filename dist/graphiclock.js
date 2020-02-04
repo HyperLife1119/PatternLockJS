@@ -113,6 +113,7 @@ var GraphicLock = (function () {
             for (var _i = 0, _a = this.dotsPos; _i < _a.length; _i++) {
                 var dot = _a[_i];
                 dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
+                this.addClickEventListener(dot);
             }
             this.addTouchMoveEventListener();
             this.addTouchCompleteEventListener();
@@ -251,9 +252,11 @@ var GraphicLock = (function () {
                 new Dot(pos[2], pos[2], '9')
             ];
             for (var i = 0; i < dotsPos.length; i++) {
-                _this.dotsPos[i].x = _this.dotsPos[i].element.style.cx = dotsPos[i].x;
-                _this.dotsPos[i].y = _this.dotsPos[i].element.style.cy = dotsPos[i].y;
-                _this.dotsPos[i].element.style.r = _this.radius;
+                _this.dotsPos[i].x = dotsPos[i].x;
+                _this.dotsPos[i].element.setAttribute('cx', dotsPos[i].x);
+                _this.dotsPos[i].y = dotsPos[i].y;
+                _this.dotsPos[i].element.setAttribute('cy', dotsPos[i].y);
+                _this.dotsPos[i].element.setAttribute('r', _this.radius);
             }
         }, 250));
     };
@@ -284,18 +287,18 @@ var GraphicLock = (function () {
             this.polyline = null;
         }
         var innderDots = this.svg.querySelectorAll('.inner-dot');
-        for (var innerDot in innderDots) {
+        for (var _i = 0, innderDots_1 = innderDots; _i < innderDots_1.length; _i++) {
+            var innerDot = innderDots_1[_i];
             this.svg.removeChild(innerDot);
         }
-        for (var _i = 0, _a = this.dotsPos; _i < _a.length; _i++) {
-            var dot = _a[_i];
+        for (var _a = 0, _b = this.dotsPos; _a < _b.length; _a++) {
+            var dot = _b[_a];
             if (dot.isActive) {
                 dot.isActive = false;
             }
-            if (dot.element.style.fill != '#eee') {
-                dot.element.style.fill = '#eee';
+            if (dot.element.getAttribute('fill') != '#eee') {
+                dot.element.setAttribute('fill', '#eee');
             }
-            this.addClickEventListener(dot);
         }
         this.callback.reset && this.callback.reset();
     };

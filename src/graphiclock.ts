@@ -183,6 +183,7 @@ class GraphicLock {
 
             for (let dot of this.dotsPos) { // 绘制大圆点
                 dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
+                this.addClickEventListener(dot);
             }
 
             this.addTouchMoveEventListener();
@@ -338,9 +339,13 @@ class GraphicLock {
             ];
 
             for (let i = 0; i < dotsPos.length; i++) { // 给圆点实例重新赋值
-                this.dotsPos[i].x = this.dotsPos[i].element.style.cx = dotsPos[i].x;
-                this.dotsPos[i].y = this.dotsPos[i].element.style.cy = dotsPos[i].y;
-                this.dotsPos[i].element.style.r = this.radius;
+                this.dotsPos[i].x = dotsPos[i].x;
+                this.dotsPos[i].element.setAttribute('cx', dotsPos[i].x);
+
+                this.dotsPos[i].y = dotsPos[i].y;
+                this.dotsPos[i].element.setAttribute('cy', dotsPos[i].y);
+
+                this.dotsPos[i].element.setAttribute('r', this.radius);
             }
         }, 250));
     }
@@ -380,14 +385,15 @@ class GraphicLock {
 
         const innderDots = this.svg.querySelectorAll('.inner-dot');
 
-        for (let innerDot in innderDots) { // 清除所有小圆点
+        for (let innerDot of innderDots) { // 清除所有小圆点
             this.svg.removeChild(innerDot);
         }
 
         for (let dot of this.dotsPos) { // 绘制大圆点
             if (dot.isActive) { dot.isActive = false; } // 取消选中
-            if (dot.element.style.fill != '#eee') { dot.element.style.fill = '#eee'; } // 恢复默认颜色
-            this.addClickEventListener(dot);
+            if (dot.element.getAttribute('fill') != '#eee') { // 恢复默认颜色
+                dot.element.setAttribute('fill', '#eee');
+            }
         }
 
         this.callback.reset && this.callback.reset();
