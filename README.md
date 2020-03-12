@@ -1,2 +1,2 @@
-# GraphicLockJS
- A Lightweight Graphic Lock Running on Web Page.
+# PatternLockJS
+ A Lightweight Pattern Lock Running on Web Page.
