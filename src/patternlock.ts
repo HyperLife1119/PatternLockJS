@@ -90,7 +90,7 @@ class Css {
         return element;
     }
 }
-class GraphicLock {
+class PatternLock {
     /** 图形锁父容器元素 */
     container: Element | any;
     /** 回调函数对象 */

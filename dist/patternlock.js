@@ -75,8 +75,8 @@ var Css = (function () {
     };
     return Css;
 }());
-var GraphicLock = (function () {
-    function GraphicLock(selectors, callback) {
+var PatternLock = (function () {
+    function PatternLock(selectors, callback) {
         if (callback === void 0) { callback = {}; }
         this.dotsPos = [];
         this.container = document.querySelector(selectors);
@@ -87,7 +87,7 @@ var GraphicLock = (function () {
         this.resize();
         this.init();
     }
-    GraphicLock.prototype.init = function () {
+    PatternLock.prototype.init = function () {
         this.width = this.container.clientWidth;
         this.radius = this.width / 6 * .7;
         this.margin = (this.width - this.radius * 6) / 4;
@@ -119,7 +119,7 @@ var GraphicLock = (function () {
             this.addTouchCompleteEventListener();
         }
     };
-    GraphicLock.prototype.addClickEventListener = function (dot) {
+    PatternLock.prototype.addClickEventListener = function (dot) {
         var _this = this;
         var listener = function () {
             if (_this.isDirty || dot.isActive) {
@@ -156,7 +156,7 @@ var GraphicLock = (function () {
             });
         }
     };
-    GraphicLock.prototype.addTouchMoveEventListener = function () {
+    PatternLock.prototype.addTouchMoveEventListener = function () {
         var _this = this;
         var listener = function (x, y, e) {
             e.preventDefault();
@@ -202,7 +202,7 @@ var GraphicLock = (function () {
             });
         }
     };
-    GraphicLock.prototype.addTouchCompleteEventListener = function () {
+    PatternLock.prototype.addTouchCompleteEventListener = function () {
         var _this = this;
         var complete = function () {
             if (!_this.isDirty) {
@@ -231,7 +231,7 @@ var GraphicLock = (function () {
             });
         }
     };
-    GraphicLock.prototype.resize = function () {
+    PatternLock.prototype.resize = function () {
         var _this = this;
         window.addEventListener('resize', this.debounce(function () {
             _this.init();
@@ -260,7 +260,7 @@ var GraphicLock = (function () {
             }
         }, 250));
     };
-    GraphicLock.prototype.verify = function () {
+    PatternLock.prototype.verify = function () {
         if (!this.callback.verify || !this.callback.verify(this.value)) {
             this.polyline && this.polyline.setAttribute('stroke', '#ff5252');
             for (var _i = 0, _a = this.dotsPos; _i < _a.length; _i++) {
@@ -278,7 +278,7 @@ var GraphicLock = (function () {
             }
         }
     };
-    GraphicLock.prototype.reset = function () {
+    PatternLock.prototype.reset = function () {
         this.points = '';
         this.value = '';
         this.isDirty = false;
@@ -302,14 +302,14 @@ var GraphicLock = (function () {
         }
         this.callback.reset && this.callback.reset();
     };
-    GraphicLock.prototype.drawDot = function (cx, cy, r, fill, className) {
+    PatternLock.prototype.drawDot = function (cx, cy, r, fill, className) {
         var dotElement = Svg.createElement('circle', {
             cx: cx, cy: cy, r: r, fill: fill, class: className
         });
         this.svg.appendChild(dotElement);
         return dotElement;
     };
-    GraphicLock.prototype.debounce = function (fn, delay) {
+    PatternLock.prototype.debounce = function (fn, delay) {
         var _this = this;
         var timer = null;
         return function () {
@@ -323,5 +323,5 @@ var GraphicLock = (function () {
             }, delay);
         };
     };
-    return GraphicLock;
+    return PatternLock;
 }());

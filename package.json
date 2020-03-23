@@ -1,11 +1,11 @@
 {
-  "name": "GraphicLock.JS",
+  "name": "PatternLock.JS",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "terser": "npx terser -c -m -o ./dist/graphiclock.min.js -- ./dist/graphiclock.js"
+    "terser": "npx terser -c -m -o ./dist/patternlock.min.js -- ./dist/patternlock.js"
   },
   "keywords": [],
   "author": "",

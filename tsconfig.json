@@ -1,6 +1,6 @@
 {
   "files": [
-    "./src/graphiclock.ts"
+    "src/patternlock.ts"
   ],
   "compilerOptions": {
     /* Basic Options */
