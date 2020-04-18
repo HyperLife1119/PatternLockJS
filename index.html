@@ -66,11 +66,13 @@
 </head>
 
 <body>
+    <!-- 设置一个空元素，作为PatternLock图案锁的容器 -->
     <div id="lock"></div>
     <div id="password"></div>
     <div id="value"></div>
 
-    <script src="./dist/patternlock.js"></script>
+    <!-- 引入patternlock.js -->
+    <script src="./dist/patternlock.min.js"></script>
     <script>
         window.onload = () => {
             let pwd = '123654789';
