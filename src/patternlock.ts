@@ -8,7 +8,7 @@ class Svg {
      */
     static createElement(name: string, attrObj: any): Element {
         const element = document.createElementNS(Svg.namespace, name);
-        for (let key in attrObj) {
+        for (const key in attrObj) {
             element.setAttribute(key, attrObj[key]);
         }
         return element;
@@ -181,7 +181,7 @@ class PatternLock {
                 new Dot(pos[2], pos[2], '9')
             ];
 
-            for (let dot of this.dotsPos) { // 绘制大圆点
+            for (const dot of this.dotsPos) { // 绘制大圆点
                 dot.element = this.drawDot(dot.x, dot.y, this.radius, '#eee', 'dot');
                 this.addClickEventListener(dot);
             }
@@ -210,6 +210,8 @@ class PatternLock {
             this.points = `${dot.x} ${dot.y} `;         // 当前折线的points属性值
             this.polyline = Svg.createElement('polyline', {
                 points: this.points,
+                'stroke-linejoin': 'round',
+                'stroke-linecap': 'round',
                 stroke: '#1de9b6',
                 style: `fill:none;stroke-width:${this.radius / 4}`
             });
@@ -222,12 +224,12 @@ class PatternLock {
             dot.element.addEventListener('touchstart', (e: any) => {
                 e.stopPropagation(); // 阻止冒泡
                 // 如果触摸点大于一
-                if (e.touches.length == 1) { listener(); }
+                e.touches.length == 1 && listener();
             });
         } else {
             dot.element.addEventListener('mousemove', (e: any) => {
                 // 如果鼠标移动时按下左键
-                if (e.buttons == 1) { listener(); }
+                e.buttons == 1 && listener();
             });
         }
 
@@ -244,7 +246,7 @@ class PatternLock {
             x = x - this.container.offsetLeft;
             y = y - this.container.offsetTop;
 
-            for (let dot of this.dotsPos) {
+            for (const dot of this.dotsPos) {
                 // 如果这个点没有被选中而且当前坐标在圆内
                 if (!dot.isActive && dot.getDistance(x, y) <= this.radius * .85) {
                     // 让上一个坐标点等于上一次的当前坐标点
@@ -258,7 +260,7 @@ class PatternLock {
                     dot.isActive = true;
                     this.drawDot(dot.x, dot.y, this.radius / 2.5, '#1de9b6', 'inner-dot'); //添加小圆点
 
-                    for (let d of this.dotsPos) {
+                    for (const d of this.dotsPos) {
                         if (!d.isActive && d.isOnLine(this.lastPos.x, this.lastPos.y, this.currentPos.x, this.currentPos.y)) {
                             d.element.setAttribute('fill', '#a7ffeb');
                             d.isActive = true;
@@ -281,7 +283,7 @@ class PatternLock {
         } else {
             document.addEventListener('mousemove', (e: any) => {
                 // 如果鼠标移动时按下左键
-                if (e.buttons == 1) { listener(e.clientX, e.clientY, e); }
+                e.buttons == 1 && listener(e.clientX, e.clientY, e);
             });
         }
     }
@@ -303,17 +305,11 @@ class PatternLock {
         }
 
         if ('ontouchend' in document.documentElement) {
-            this.svg.addEventListener('touchend', () => {
-                complete();
-            });
+            this.svg.addEventListener('touchend', () => complete());
 
-            this.svg.addEventListener('touchcancel', () => { // 当触摸事件被意外中断时
-                complete();
-            });
+            this.svg.addEventListener('touchcancel', () => complete()); // 当触摸事件被意外中断时
         } else {
-            document.addEventListener('mouseup', () => { // 当鼠标松开时
-                complete();
-            });
+            document.addEventListener('mouseup', () => complete()); // 当鼠标松开时
         }
     }
 
@@ -356,7 +352,7 @@ class PatternLock {
     verify() {
         if (!this.callback.verify || !this.callback.verify(this.value)) {
             this.polyline && this.polyline.setAttribute('stroke', '#ff5252');
-            for (let dot of this.dotsPos) {
+            for (const dot of this.dotsPos) {
                 if (dot.isActive) {
                     dot.element.setAttribute('fill', '#ffcdd2');
                 }
@@ -366,7 +362,7 @@ class PatternLock {
                 innerDots[i].setAttribute('fill', '#ff5252');
             }
             // 震动150毫秒
-            if ('vibrate' in window.navigator) { window.navigator.vibrate(150); }
+            'vibrate' in window.navigator && window.navigator.vibrate(150);
         }
     }
 
@@ -385,15 +381,13 @@ class PatternLock {
 
         const innderDots = this.svg.querySelectorAll('.inner-dot');
 
-        for (let innerDot of innderDots) { // 清除所有小圆点
+        for (const innerDot of innderDots) { // 清除所有小圆点
             this.svg.removeChild(innerDot);
         }
 
-        for (let dot of this.dotsPos) { // 绘制大圆点
+        for (const dot of this.dotsPos) { // 绘制大圆点
             if (dot.isActive) { dot.isActive = false; } // 取消选中
-            if (dot.element.getAttribute('fill') != '#eee') { // 恢复默认颜色
-                dot.element.setAttribute('fill', '#eee');
-            }
+            dot.element.getAttribute('fill') != '#eee' && dot.element.setAttribute('fill', '#eee'); // 恢复默认颜色
         }
 
         this.callback.reset && this.callback.reset();

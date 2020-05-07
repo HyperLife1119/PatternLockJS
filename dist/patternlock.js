@@ -134,6 +134,8 @@ var PatternLock = (function () {
             _this.points = dot.x + " " + dot.y + " ";
             _this.polyline = Svg.createElement('polyline', {
                 points: _this.points,
+                'stroke-linejoin': 'round',
+                'stroke-linecap': 'round',
                 stroke: '#1de9b6',
                 style: "fill:none;stroke-width:" + _this.radius / 4
             });
@@ -143,16 +145,12 @@ var PatternLock = (function () {
         if ('ontouchstart' in document.documentElement) {
             dot.element.addEventListener('touchstart', function (e) {
                 e.stopPropagation();
-                if (e.touches.length == 1) {
-                    listener();
-                }
+                e.touches.length == 1 && listener();
             });
         }
         else {
             dot.element.addEventListener('mousemove', function (e) {
-                if (e.buttons == 1) {
-                    listener();
-                }
+                e.buttons == 1 && listener();
             });
         }
     };
@@ -196,9 +194,7 @@ var PatternLock = (function () {
         }
         else {
             document.addEventListener('mousemove', function (e) {
-                if (e.buttons == 1) {
-                    listener(e.clientX, e.clientY, e);
-                }
+                e.buttons == 1 && listener(e.clientX, e.clientY, e);
             });
         }
     };
@@ -218,17 +214,11 @@ var PatternLock = (function () {
             }, 1000);
         };
         if ('ontouchend' in document.documentElement) {
-            this.svg.addEventListener('touchend', function () {
-                complete();
-            });
-            this.svg.addEventListener('touchcancel', function () {
-                complete();
-            });
+            this.svg.addEventListener('touchend', function () { return complete(); });
+            this.svg.addEventListener('touchcancel', function () { return complete(); });
         }
         else {
-            document.addEventListener('mouseup', function () {
-                complete();
-            });
+            document.addEventListener('mouseup', function () { return complete(); });
         }
     };
     PatternLock.prototype.resize = function () {
@@ -273,9 +263,7 @@ var PatternLock = (function () {
             for (var i = 0; i < innerDots.length; i++) {
                 innerDots[i].setAttribute('fill', '#ff5252');
             }
-            if ('vibrate' in window.navigator) {
-                window.navigator.vibrate(150);
-            }
+            'vibrate' in window.navigator && window.navigator.vibrate(150);
         }
     };
     PatternLock.prototype.reset = function () {
@@ -296,9 +284,7 @@ var PatternLock = (function () {
             if (dot.isActive) {
                 dot.isActive = false;
             }
-            if (dot.element.getAttribute('fill') != '#eee') {
-                dot.element.setAttribute('fill', '#eee');
-            }
+            dot.element.getAttribute('fill') != '#eee' && dot.element.setAttribute('fill', '#eee');
         }
         this.callback.reset && this.callback.reset();
     };
