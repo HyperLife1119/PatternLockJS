@@ -4,7 +4,8 @@
 </div>
 </br>
 
-# PatternLockJS
+<h1 align=center>PatternLockJS</h1>
+
 一个运行在浏览器上的图案锁，同时支持桌面端和移动端。
 
 A pattern lock running on the browser, supporting both desktop and mobile.
