@@ -80,12 +80,13 @@
             const valueElement = document.querySelector('#value');
 
             const lock = new PatternLock('#lock', {
-                complete: (value) => {
+                complete: value => {
                     valueElement.innerText = value;
                 },
                 reset: () => {
+                    console.log('reset');
                 },
-                verify: (value) => {
+                verify: value => {
                     if (value == pwd) {
                         alert('密码正确！');
                         return true;

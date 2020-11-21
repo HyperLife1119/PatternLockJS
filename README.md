@@ -4,8 +4,6 @@
 A pattern lock running on the browser, supporting both desktop and mobile.
 > 特点：基于SVG实现，简单，灵活且易用。
 
----
-
 #### 用法 (Usage)：
 1. 设置一个空元素，作为PatternLock图案锁的容器
 ```
@@ -28,15 +26,15 @@ A pattern lock running on the browser, supporting both desktop and mobile.
         * `verify`：接收一个参数，值为用户操作PatternLock图案锁得出的密码。在PatternLock图案锁进行密码验证时触发，该函数必须返回一个布尔值。（必须）
         * `complete`：接收一个参数，值为用户操作PatternLock图案锁得出的密码。在PatternLock图案锁进行密码验证完成时触发。（非必须）
         * `reset`：在PatternLock图案锁重置时触发。（非必须）
-```
+```javascript
 const lock = new PatternLock('#lock', {
-    complete: (value) => {
+    complete: value => {
         console.log('complete: ' + value);
     },
     reset: () => {
         console.log('reset');
     },
-    verify: (value) => {
+    verify: value => {
         if (value == pwd) {
             alert('密码正确！');
             return true;
@@ -46,7 +44,7 @@ const lock = new PatternLock('#lock', {
     }
 });
 ```
-5. 小贴士：添加 `overscroll-behavior-y: contain;` 到body元素，可阻止部分移动端浏览器下拉刷新等默认行为（这些浏览器默认行为可能会干扰用户操作PatternLock图案锁）。
+5. Tips：添加 `overscroll-behavior-y: contain;` 到body元素，可阻止部分移动端浏览器下拉刷新等默认行为（这些浏览器默认行为可能会干扰用户操作PatternLock图案锁）。
 ```
 body {
     overscroll-behavior-y: contain;
