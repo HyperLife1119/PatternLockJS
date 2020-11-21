@@ -1,3 +1,9 @@
+
+<div align=center>
+    <img src=./logo.png width=256 height=256 />
+</div>
+</br>
+
 # PatternLockJS
 一个运行在浏览器上的图案锁，同时支持桌面端和移动端。
 
