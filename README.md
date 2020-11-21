@@ -2,11 +2,10 @@
 <div align=center>
     <img src=./logo.png width=256 height=256 />
     <h1>PatternLockJS</h1>
+    <p>一个运行在浏览器上的图案锁，同时支持桌面端和移动端。</p>
+    <p>A pattern lock running on the browser, supporting both desktop and mobile.</p>
 </div>
 
-一个运行在浏览器上的图案锁，同时支持桌面端和移动端。
-
-A pattern lock running on the browser, supporting both desktop and mobile.
 > 特点：基于SVG实现，简单，灵活且易用。
 
 #### 用法 (Usage)：
