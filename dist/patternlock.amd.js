@@ -1,5 +1,4 @@
-var PatternLock = (function () {
-    'use strict';
+define(function () { 'use strict';
 
     class Vector {
         constructor(x, y) {
@@ -265,5 +264,5 @@ var PatternLock = (function () {
 
     return PatternLock;
 
-}());
-//# sourceMappingURL=patternlock.js.map
+});
+//# sourceMappingURL=patternlock.amd.js.map

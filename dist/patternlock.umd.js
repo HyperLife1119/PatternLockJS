@@ -1,5 +1,8 @@
-var PatternLock = (function () {
-    'use strict';
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.patternlock = factory());
+}(this, (function () { 'use strict';
 
     class Vector {
         constructor(x, y) {
@@ -265,5 +268,5 @@ var PatternLock = (function () {
 
     return PatternLock;
 
-}());
-//# sourceMappingURL=patternlock.js.map
+})));
+//# sourceMappingURL=patternlock.umd.js.map
